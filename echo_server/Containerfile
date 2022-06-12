@@ -1,0 +1,4 @@
+FROM scratch
+COPY target/wasm32-wasi/release/echo_server.wasm /
+
+CMD ["/echo_server.wasm"]

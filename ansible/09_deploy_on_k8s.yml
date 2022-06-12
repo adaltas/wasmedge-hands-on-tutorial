@@ -1,0 +1,36 @@
+---
+- hosts: master
+  become: yes
+  become_user: "{{ ansible_user }}"
+  tasks:
+    - name: Tag image to local registry
+      shell: "podman image tag localhost/echo_server:latest localhost:5000/echo_server:latest"
+
+    - name: Push to private registry
+      shell: podman push --tls-verify=false localhost:5000/echo_server:latest
+
+    - name: Send deployment yml
+      copy:
+        src: echo_server.yml
+        dest: /tmp/echo_server.yml
+
+    - name: Apply deployment
+      shell: kubectl apply -f /tmp/echo_server.yml
+
+    - name: Wait for deployment availability
+      shell: kubectl wait deployment echo-server-deployment --for condition=Available
+
+    - name: Send payload to container
+      shell: echo "adaltas" | nc localhost 31808
+
+    - name: Check deployment logs
+      shell: kubectl logs deployment/echo-server-deployment
+      register: logs
+
+    - name: Check logs content
+      assert:
+        that: '"Received 8 bytes" in logs.stdout'
+        msg: 'Deployment logs should contain the string "Received 8 bytes"'
+
+    - name: Delete deployment
+      shell: kubectl delete -f /tmp/echo_server.yml

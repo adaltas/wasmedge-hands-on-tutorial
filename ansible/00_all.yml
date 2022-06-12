@@ -1,0 +1,10 @@
+---
+- import_playbook: 01_install_wasmedge.yml
+- import_playbook: 02_install_rust.yml
+- import_playbook: 03_build_echo_server.yml
+- import_playbook: 04_install_container_runtime.yml
+- import_playbook: 05_install_container_tools.yml
+- import_playbook: 06_run_in_container.yml
+- import_playbook: 07_install_kubernetes.yml
+- import_playbook: 08_private_registry.yml
+- import_playbook: 09_deploy_on_k8s.yml

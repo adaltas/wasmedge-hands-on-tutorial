@@ -1,0 +1,33 @@
+---
+- hosts: master
+  become: no
+  tasks:
+    - name: Build container
+      shell: buildah bud --annotation "module.wasm.image/variant=compat" -t echo_server:latest
+      args:
+        chdir: /opt/echo_server
+
+    - name: Run container
+      containers.podman.podman_container:
+        name: echo_server
+        detach: yes
+        publish:
+          - 8080:8080
+        image: echo_server
+
+    - name: Send payload to container
+      shell: echo "adaltas" | nc localhost 8080
+
+    - name: Check container logs
+      shell: podman logs echo_server
+      register: logs
+
+    - name: Check logs content
+      assert:
+        that: '"Received 8 bytes" in logs.stdout'
+        msg: 'Podman logs should contain the string "Received 8 bytes"'
+
+    - name: Stop and remove container
+      containers.podman.podman_container:
+        name: echo_server
+        state: absent

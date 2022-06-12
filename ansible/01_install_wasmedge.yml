@@ -1,0 +1,26 @@
+---
+- hosts: master
+  become: yes
+  tasks:
+    - name: Install packages
+      apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+          - build-essential
+        update_cache: yes
+
+    - name: Get wasmedge install script
+      get_url:
+        url: https://raw.githubusercontent.com/WasmEdge/WasmEdge/024c012319f2c9f10123c83c1804920a4fb0f8ad/utils/install.sh
+        mode: 0755
+        dest: /tmp
+        checksum: sha256:775f1cc4193a9cc287049e4ada373cd31b068ebe2b20f217e7438f0b8be2a4ca
+
+    - name: Install WasmEdge globally
+      shell: ./install.sh --path=/usr/local --version=0.9.1
+      args:
+        chdir: /tmp
+        creates: "/usr/local/bin/wasmedge"

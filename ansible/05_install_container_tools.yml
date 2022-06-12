@@ -1,0 +1,32 @@
+---
+- hosts: master
+  become: yes
+  tasks:
+    - name: Add OpenSuse apt key
+      ansible.builtin.apt_key:
+        url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_20.04/Release.key
+        state: present
+
+    - name: Add OpenSuse repository
+      apt_repository:
+        repo: deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_20.04/ /
+        filename: opensuse
+        state: present
+
+    - name: Install Buildah and Podman
+      apt:
+        name:
+          - buildah
+          - podman
+        update_cache: yes
+
+    - name: Copy default containers configuration
+      copy:
+        src: containers.conf
+        dest: /etc/containers/containers.conf
+        mode: 0744
+
+    - name: Restart podman
+      service:
+        name: podman
+        state: restarted

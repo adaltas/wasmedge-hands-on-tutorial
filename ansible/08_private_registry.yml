@@ -1,0 +1,21 @@
+---
+- hosts: master
+  become: yes
+  become_user: "{{ ansible_user }}"
+  tasks:
+    - name: Create storage folders
+      become_user: root
+      file:
+        path: "/opt/registry/data"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+
+    - name: Start registry container
+      containers.podman.podman_container:
+        name: registry
+        publish:
+          - 5000:5000
+        image: registry:2
+        volume:
+          - /opt/registry/data:/var/lib/registry:z
