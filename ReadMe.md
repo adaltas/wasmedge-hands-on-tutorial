@@ -2,26 +2,16 @@
 
 This repository is better read along with [this article](https://adaltas.com/en/..)
 
-Install pip dependencies:
 ```bash
+# Setting up python dependencies
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-```
-
-Install ansible dependencies:
-```bash
-source venv/bin/activate
+# Setting up ansible dependencies
 ansible-galaxy collection install -r requirements.yml
-```
-
-Setting up the virtual machine:
-```bash
+# Setting up the virtual machine
 vagrant up
-```
-
-Run the playbooks:
-```bash
+# Running the playbooks
 ./hosts.sh # generates inventory file
 ansible-playbook ansible/00_all.yml
 ```
